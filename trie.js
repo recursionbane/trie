@@ -22,45 +22,45 @@
  *  THE SOFTWARE.
  */
 
- /**
-  * Trie is a kind of digital search tree. (See [Knuth1972] for more details
-  * on digital search trees.)
-  * [Fredkin1960] introduced the trie terminology, which is abbreviated from "Retrieval".
-  * [Knuth1972] Knuth, D. E. The Art of Computer Programming Vol. 3, Sorting and Searching. Addison-Wesley. 1972.
-  * [Fredkin1960] Fredkin, E. Trie Memory. Communication of the ACM. Vol. 3:9 (Sep 1960). pp. 490-499.
-  * <a href="http://linux.thai.net/~thep/datrie/datrie.html">source</a>
-  * @see <a href="http://en.wikipedia.org/wiki/Trie">Wikipedia article</a>
-  * 
-  * The trie implementation of Dennis Byrne served as a starting point and inspiration:
-  * @link http://notdennisbyrne.blogspot.com/2008/12/javascript-trie-implementation.html
-  * 
-  * @param {String} stem    One character long representation of the trie node instance
-  * @default ''
-  * @param {Array}  meta    Metadata associated with a word is stored here
-  * @default {}
-  * @param {Number} sorting Sort method. May be {@link SORT_ASC} or {@link SORT_DESC}.
-  * @default SORT_DESC
-  * @property {Number} SORT_ASC sort the trie in ascending lexical order
-  * @property {Number} SORT_DESC sort the trie in descending lexical order
-  * @property {Number} SORT_NONE  sort the trie in no particular order
-  * @author Mike de Boer <info AT mikedeboer DOT nl>
-  * @license MIT
-  * @constructor
-  */
-var Trie = (function() {
-    
+/**
+ * Trie is a kind of digital search tree. (See [Knuth1972] for more details
+ * on digital search trees.)
+ * [Fredkin1960] introduced the trie terminology, which is abbreviated from "Retrieval".
+ * [Knuth1972] Knuth, D. E. The Art of Computer Programming Vol. 3, Sorting and Searching. Addison-Wesley. 1972.
+ * [Fredkin1960] Fredkin, E. Trie Memory. Communication of the ACM. Vol. 3:9 (Sep 1960). pp. 490-499.
+ * <a href="http://linux.thai.net/~thep/datrie/datrie.html">source</a>
+ * @see <a href="http://en.wikipedia.org/wiki/Trie">Wikipedia article</a>
+ * 
+ * The trie implementation of Dennis Byrne served as a starting point and inspiration:
+ * @link http://notdennisbyrne.blogspot.com/2008/12/javascript-trie-implementation.html
+ * 
+ * @param {String} stem    One character long representation of the trie node instance
+ * @default ''
+ * @param {Array}  meta    Metadata associated with a word is stored here
+ * @default {}
+ * @param {Number} sorting Sort method. May be {@link SORT_ASC} or {@link SORT_DESC}.
+ * @default SORT_DESC
+ * @property {Number} SORT_ASC sort the trie in ascending lexical order
+ * @property {Number} SORT_DESC sort the trie in descending lexical order
+ * @property {Number} SORT_NONE  sort the trie in no particular order
+ * @author Mike de Boer <info AT mikedeboer DOT nl>
+ * @license MIT
+ * @constructor
+ */
+var Trie = (function () {
+
     /** @ignore */
     function Trie(stem, sorting) {
-        this.stem        = stem || "";
-        this.nstem       = this.stem.charCodeAt(0);
-        this.sorting     = sorting || Trie.SORT_DESC;
-        this.wordCount   = 0;
+        this.stem = stem || "";
+        this.nstem = this.stem.charCodeAt(0);
+        this.sorting = sorting || Trie.SORT_DESC;
+        this.wordCount = 0;
         this.prefixCount = 0;
-        this.children    = [];
-        this.meta        = [];
+        this.children = [];
+        this.meta = [];
     }
 
-    Trie.SORT_ASC  = 0x0001;
+    Trie.SORT_ASC = 0x0001;
     Trie.SORT_DESC = 0x0002;
     Trie.SORT_NONE = 0x0004;
 
@@ -79,7 +79,7 @@ var Trie = (function() {
          * @param {Object} meta Metadata associated with a word
          * @type  {void}
          */
-        add: function(word, meta) {
+        add: function (word, meta) {
             if (word) {
                 var t,
                     s = this.sorting,
@@ -102,8 +102,7 @@ var Trie = (function() {
                     t = new Trie(k, s);
                     if (!s || !c.length || s & Trie.SORT_NONE) {
                         c.push(t);
-                    }
-                    else if (s & Trie.SORT_DESC) {
+                    } else if (s & Trie.SORT_DESC) {
                         i = l;
                         do {
                             if (--i < 0) {
@@ -113,8 +112,7 @@ var Trie = (function() {
                         } while (c[i].stem > k)
                         if (i >= 0)
                             c.splice(i + 1, 0, t);
-                    }
-                    else {
+                    } else {
                         i = 0, --l;
                         do {
                             if (++i > l) {
@@ -127,13 +125,12 @@ var Trie = (function() {
                     }
                 }
                 t.add(word.substring(1), meta);
-            }
-            else {
+            } else {
                 this.meta.push(meta);
                 ++this.wordCount;
             }
         },
-        
+
         /**
          * Update a word in the dictionary. This update implementation is
          * implemented like a file rename action as on a filesystem: add a node
@@ -145,11 +142,11 @@ var Trie = (function() {
          * @param {Object} meta Metadata associated with a word
          * @type  {void}
          */
-        update: function(sOld, sNew, meta) {
+        update: function (sOld, sNew, meta) {
             this.remove(sOld);
             this.add(sNew, meta);
         },
-        
+
         /**
          * Remove a word from the dictionary. This function uses the
          * walker, which is a generic implementation of a tree walker.
@@ -157,12 +154,12 @@ var Trie = (function() {
          * @param {String} word the word to remove
          * @type  {void}
          */
-        remove: function(word) {
-            walker(word, this, function(trie, idx) {
+        remove: function (word) {
+            walker(word, this, function (trie, idx) {
                 trie.children.splice(idx, 1);
             });
         },
-        
+
         /**
          * Find a trie node that is paired with a word or prefix 's'. Like the
          * {@link remove} function, this function also uses the walker.
@@ -170,19 +167,19 @@ var Trie = (function() {
          * @param {String}   prefix the word or prefix to search for in the dictionary
          * @type  {Trie}
          */
-        find: function(prefix) {
-            return walker(prefix, this, function(trie, idx) {
+        find: function (prefix) {
+            return walker(prefix, this, function (trie, idx) {
                 return trie.children[idx];
             });
         },
-        
+
         /**
          * @alias {find}
          *
          * @param {String} prefix the word or prefix to search for in the dictionary
          * @type  {Trie}
          */
-        findPrefix: function(prefix) {
+        findPrefix: function (prefix) {
             // AFAIK, this is just an alias of find, because that returns a trie rootnode.
             // From that rootnode, it's easy to create a list of disambiguations.
             return this.find(prefix);
@@ -195,7 +192,7 @@ var Trie = (function() {
          *                          children of this dictionary
          * @type  {Trie}
          */
-        getChild: function(prefix) {
+        getChild: function (prefix) {
             var i = 0,
                 c = this.children,
                 l = c.length;
@@ -206,7 +203,7 @@ var Trie = (function() {
 
             return null;
         },
-        
+
         /**
          * A version of {@link getChild} with a Boolean return type.
          *
@@ -214,7 +211,7 @@ var Trie = (function() {
          *                          children of this dictionary
          * @type  {Boolean}
          */
-        hasChild: function(prefix) {
+        hasChild: function (prefix) {
             return this.getChild(prefix) !== null;
         },
 
@@ -230,7 +227,7 @@ var Trie = (function() {
          *                 {@link Trie#SORT_DESC}
          * @type  {void}
          */
-        sort: function(direction) {
+        sort: function (direction) {
             if (typeof direction == "undefined")
                 direction = Trie.SORT_DESC;
             if (!this.prefixCount || this.sorting === direction) return;
@@ -255,14 +252,14 @@ var Trie = (function() {
          *
          * @type  {Array}
          */
-        getWords: function() {
+        getWords: function () {
             var words = [],
-                c     = this.children,
-                i     = 0,
-                l     = c.length;
+                c = this.children,
+                i = 0,
+                l = c.length;
             for (; i < l; ++i) {
                 if (c[i].wordCount) {
-                    words = words.concat(c[i].meta.map(function(meta) {
+                    words = words.concat(c[i].meta.map(function (meta) {
                         return meta.word;
                     }));
                 }
@@ -271,14 +268,100 @@ var Trie = (function() {
             return words;
         },
 
+        // Collapse the trie into a shell-style expander string
+        // Example: This input array: spill spall spell
+        // When collapsed, would yield: sp{i,a,e}ll
+        collapse: function (node) {
+            let top_level = false;
+            if (node == undefined) {
+                // Top-level call
+                top_level = true;
+                // Set node to be the top-level node of the trie
+                this.collapse_string = '';
+                node = this;
+            }
+
+            // First and all future calls
+            // If more than one children exist at this level, add an opening curly and add all child stems 
+            //  separated by commas to the collapse string, then recurse through each child via collapse()
+            // If only one child exists, append the stem to the current collapse string, then call collapse() on the child
+            // If no children exist, add a closing curly to the collapse string and return
+
+            if (node.children != undefined && node.children.length > 1) {
+                this.collapse_string = this.collapse_string + '{';
+                for (child_idx in node.children) {
+                    let child = node.children[child_idx];
+                    // console.log('collapse: More than one child detected (child index ' + child_idx + '); collapse string coming in is: ' + this.collapse_string + '; child is: ' + JSON.stringify(child, null, 2));
+
+                    // If no open braces exist, open one for this group of children
+                    if (this.collapse_string.split("{").length <= this.collapse_string.split("}").length) {
+                        this.collapse_string = this.collapse_string + ',{';
+                    }
+
+                    this.collapse_string = this.collapse_string + child.stem;
+                    if (child_idx == node.children.length - 1) {
+                        this.parent_last_child = true;
+                    }
+                    this.collapse(child);
+
+                    // If not the very last child, add a comma in the collapse string
+                    if (child_idx <= node.children.length - 2) {
+                        this.collapse_string = this.collapse_string + ',';
+                    }
+
+
+                }
+
+                if (this.parent_last_child && this.collapse_string.split("{").length > this.collapse_string.split("}").length) {
+                    // Remove any trailing commas before closing the brace
+                    this.collapse_string = this.collapse_string.replace(/,$/, '');
+                    this.collapse_string = this.collapse_string + '},';
+                }
+
+            } else if (node.children != undefined && node.children.length == 1) {
+                var child = node.children[0];
+                // console.log('collapse: Exactly one child detected; collapse string coming in is: ' + this.collapse_string + '; child is: ' + JSON.stringify(child, null, 2));
+                this.collapse_string = this.collapse_string + child.stem;
+                this.collapse(child);
+            } else if (node.children == undefined || node.children.length == 0) {
+                // End of this branch
+                // console.log('collapse: End of branch detected; collapse string coming in is: ' + this.collapse_string + '; node is: ' + JSON.stringify(node, null, 2));
+                return;
+            }
+
+            // return this.collapse_string;
+
+            // Perform final cleanup only at the top-level
+            if (top_level) {
+                // Remove trailing and leading commas, only at the top-level
+                this.collapse_string = this.collapse_string.replace(/,$/, '');
+            }
+            return this.collapse_string;
+        },
+
+        // Add all strings in a single 1D Array
+        fromArray: function (arr) {
+            for (idx in arr) {
+                this.add(arr[idx]);
+            }
+        },
+
+        // Add all strings to a single 1D Array AND collapse them
+        collapseFromArray: function (arr) {
+            var child = new Trie();
+            child.fromArray(arr);
+            return child.collapse();
+        },
+
+
         /**
          * Retrieve the prefix count of the applied argument
          *
          * @param {String} word the prefix or word-completing stem
          * @type  {Number}
          */
-        getPrefixCount: function(word){
-            return walker(word, this, function(trie, idx) {
+        getPrefixCount: function (word) {
+            return walker(word, this, function (trie, idx) {
                 return trie.children[idx].prefixCount;
             }) || 0;
         },
@@ -289,26 +372,26 @@ var Trie = (function() {
          * @param {String} word the prefix or word-completing stem
          * @type  {Number}
          */
-        getWordCount: function(word){
-            return walker(word, this, function(trie, idx) {
+        getWordCount: function (word) {
+            return walker(word, this, function (trie, idx) {
                 return trie.children[idx].wordCount;
             }) || 0;
         },
-        
+
         /**
          * Overrides Object.prototype.toString to deliver a more context sensitive
          * String representation of a Trie.
          *
          * @type {String}
          */
-        toString: function() {
-            return "[Trie] '" + this.stem + "': {\n"
-                 + "    stem: " + this.stem + ",\n"
-                 + "    prefixCount: " + this.prefixCount + ",\n"
-                 + "    wordCount: " + this.wordCount + ",\n"
-                 + "    metadata: " + JSON.stringify(this.meta) + ",\n"
-                 + "    children: [Array]{" + this.children.length + "}\n"
-                 + "}";
+        toString: function () {
+            return "[Trie] '" + this.stem + "': {\n" +
+                "    stem: " + this.stem + ",\n" +
+                "    prefixCount: " + this.prefixCount + ",\n" +
+                "    wordCount: " + this.wordCount + ",\n" +
+                "    metadata: " + JSON.stringify(this.meta) + ",\n" +
+                "    children: [Array]{" + this.children.length + "}\n" +
+                "}";
         },
 
         /**
@@ -318,11 +401,11 @@ var Trie = (function() {
          * @param {Object} json A serialized version of a Trie
          * @type  {void}
          */
-        fromJSON: function(json) {
-            STATIC_PROPS.forEach(function(prop) {
+        fromJSON: function (json) {
+            STATIC_PROPS.forEach(function (prop) {
                 this[prop] = json[prop];
             }.bind(this));
-            this.children = json.children.map(function(data) {
+            this.children = json.children.map(function (data) {
                 var child = new Trie();
                 child.fromJSON(data);
                 return child;
@@ -335,19 +418,20 @@ var Trie = (function() {
          *
          * @type {Object}
          */
-        toJSON: function() {
+        toJSON: function () {
             var json = {
-                children: this.children.map(function(child) {
+                children: this.children.map(function (child) {
                     return child.toJSON();
                 })
             };
-            STATIC_PROPS.forEach(function(prop) {
+            STATIC_PROPS.forEach(function (prop) {
                 json[prop] = this[prop];
             }.bind(this));
             return json;
-        }
+        },
+
     };
-    
+
     /**
      * NOT named after Johnny, but merely after the verb 'to walk'.
      * This function walks along a Trie top-down until it finds the node which
@@ -370,12 +454,12 @@ var Trie = (function() {
     function walker(word, trie, method) {
         if (!word || !trie || !method) return null;
         var ch, c, l, i, prev;
-        
+
         while (word.length > 0) {
             ch = word.charAt(0),
-            c  = trie.children,
-            l  = c.length,
-            i  = 0;
+                c = trie.children,
+                l = c.length,
+                i = 0;
             for (; i < l; ++i) {
                 if (ch == c[i].stem)
                     break;
@@ -383,12 +467,12 @@ var Trie = (function() {
             if (i == l)
                 return null; // not found
             word = word.substring(1),
-            prev = trie,
-            trie = c[i];
+                prev = trie,
+                trie = c[i];
         }
         return method(prev, i);
     }
-    
+
     /**
      * Sorting helper function that can be passed to Array.sort().
      * The result of this helper will be that all nodes will be sorted in 
@@ -404,7 +488,7 @@ var Trie = (function() {
             s2 = b.nstem;
         return (s1 < s2) ? 1 : (s1 > s2) ? -1 : 0;
     }
-    
+
     /**
      * Sorting helper function that can be passed to Array.sort().
      * The result of this helper will be that all nodes will be sorted in 
@@ -420,6 +504,6 @@ var Trie = (function() {
             s2 = b.nstem;
         return (s1 > s2) ? 1 : (s1 < s2) ? -1 : 0;
     }
-    
+
     return Trie;
 })();
