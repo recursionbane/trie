@@ -12,6 +12,7 @@ A convenience method exists exposing just this functionality using a throwaway o
     console.log('Collapsed trie is: "' + trie.collapseFromArray(['spill', 'spall', 'spell']) + '"');
     // "sp{ill,all,ell}"
 
+This behavior should mirror Bash's reverse completion 'complete-into-braces' readline command, activated interactively using Meta + { (typically Alt + Left-Curly)
 
 Short story
 -----------
